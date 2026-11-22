@@ -4,7 +4,7 @@
 // se editan a mano. Se juntan las dos como hace la web.
 import { get, SourceError } from './comun';
 import { addDays, iso, madrid, readCsv, type Feed, type Files, type Row } from './gtfs';
-import { parseDays, slug, toGtfs, type Parada, type Tabla } from './horarios';
+import { LECTIVOS, parseDays, slug, toGtfs, type Parada, type Tabla } from './horarios';
 
 const SITE = 'https://www.bustorresmenorca.com/horarios';
 
@@ -63,11 +63,18 @@ function generatedToTablas(g: Generated, known: Map<string, Parada>): Tabla[] {
     const byName = known.get(`nombre:${slug(name)}`);
     return byCode ?? byName ?? { id: `torres-${slug(name)}`, nombre: name };
   });
+  // La «X» es «sombreada» (de lunes a viernes no festivos) salvo que la nota diga otra cosa: en la
+  // L15 marca la salida que «solo circula en días lectivos». Si lo dice la nota de días, todo.
+  const school = (n: string) => /lectiv/i.test(n);
+  const allSchool = said !== undefined && school(said);
+  const shadedSchool = !notes.some((n) => /sombread/i.test(n)) && notes.some(school);
   const linea: Tabla['linea'] = {
     id: s.routeId,
     numero: g.line,
     nombre: s.title,
-    ...(notes.length > 0 && { nota: notes.join(' ') }),
+    ...(notes.length > 0 && {
+      nota: [...notes, ...(notes.some(school) ? [`${LECTIVOS}.`] : [])].join(' '),
+    }),
   };
   // Una línea circular (la L10 sale y vuelve a la estación de Maó) va con su nombre de cabecera.
   const last = paradas.at(-1);
@@ -87,11 +94,6 @@ function generatedToTablas(g: Generated, known: Map<string, Parada>): Tabla[] {
   }));
   const used = columns.filter((c) => c.times.some((t) => t !== null));
   const weekdays = [...dias].map((d, i) => (i < 5 ? d : '0')).join('');
-  // La «X» es «sombreada» (de lunes a viernes no festivos) salvo que la nota diga otra cosa: en la
-  // L15 marca la salida que «solo circula en días lectivos». Si lo dice la nota de días, todo.
-  const school = (n: string) => /lectiv/i.test(n);
-  const allSchool = said !== undefined && school(said);
-  const shadedSchool = !notes.some((n) => /sombread/i.test(n)) && notes.some(school);
   return [
     {
       ...base,
@@ -160,10 +162,8 @@ export function combine(
     const until = compact(g.schedule.validUntil);
     if (until < today) continue;
     const own = calendar.filter((c) => routesOf.get(col(c, 'service_id'))?.has(g.schedule.routeId));
-    const covered =
-      own.length > 0 &&
-      own.some((c) => col(c, 'start_date') <= from) &&
-      own.some((c) => col(c, 'end_date') >= until);
+    // Un solo servicio que abarque todas sus fechas: dos que solo tocan los extremos dejan un hueco.
+    const covered = own.some((c) => col(c, 'start_date') <= from && col(c, 'end_date') >= until);
     if (covered) continue;
     tablas.push(...generatedToTablas(g, known));
     // Lo del GTFS de esa línea acaba el día antes, si el servicio es solo suyo.
@@ -203,6 +203,8 @@ export function combine(
   ]);
   // Los ids de toGtfs (s0, 0-0) no chocan con los del GTFS de la web (H1001, 60a01…).
   const own = toGtfs('Autocares Torres', tablas);
+  // Las fechas del feed salen de los dos calendarios, no solo de los horarios a mano.
+  own.delete('feed_info.txt');
   for (const [name, rows] of own) site.set(name, [...(site.get(name) ?? []), ...rows]);
   return site;
 }

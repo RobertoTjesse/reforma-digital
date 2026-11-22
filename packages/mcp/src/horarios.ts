@@ -42,11 +42,12 @@ export function lectivo(ymd: string, festivos: Set<string>): boolean {
   );
 }
 
-/** AAAAMMDD a DD/MM/AAAA. */
 export const fecha = (ymd: string) => `${ymd.slice(6, 8)}/${ymd.slice(4, 6)}/${ymd.slice(0, 4)}`;
 
+const FIN_CURSO = CURSOS.at(-1)?.fin ?? '';
+
 /** Lo que se dice de los servicios de días lectivos en la nota de cada línea. */
-export const LECTIVOS = `Solo en días lectivos (calendario escolar de las Illes Balears, publicado hasta el ${fecha(CURSOS.at(-1)?.fin ?? '')}; sin los días de libre disposición de cada centro)`;
+export const LECTIVOS = `Solo en días lectivos (calendario escolar de las Illes Balears, publicado hasta el ${fecha(FIN_CURSO)}; sin los días de libre disposición de cada centro)`;
 
 export type Parada = { id: string; nombre: string; codigo?: string; lat?: number; lon?: number };
 
@@ -85,7 +86,6 @@ export function* days(desde: string, hasta: string) {
   }
 }
 
-/** Hora «H:MM» o «HH:MM» a segundos. */
 function time(text: string, label: string): number {
   const m = /^(\d{1,2})[:.](\d\d)$/.exec(text.trim());
   if (!m) throw new SourceError(`Hora «${text}» no válida en el horario de ${label}.`);
@@ -105,6 +105,7 @@ export function toGtfs(agencia: string, tablas: Tabla[], festivos = FESTIVOS_BAL
   const calendarDates: Row[] = [];
   const trips: Row[] = [];
   const stopTimes: Row[] = [];
+  let [desde, end] = ['99999999', ''];
 
   tablas.forEach((t, i) => {
     if (!/^[01]{7}$/.test(t.dias)) throw new SourceError(`Días «${t.dias}» no válidos.`);
@@ -128,7 +129,16 @@ export function toGtfs(agencia: string, tablas: Tabla[], festivos = FESTIVOS_BAL
     }
     const service = `s${i}`;
     const closed = new Set(t.cierres);
-    for (const { ymd, weekday } of days(t.desde, t.hasta)) {
+    // Más allá del último año de festivos o del último curso publicados no se sabe qué días hay
+    // servicio: la tabla acaba ahí y el feed lo dice, en vez de dar días de más o de menos.
+    const known = [
+      `${(festivos.at(-1) ?? '').slice(0, 4)}1231`,
+      t.soloLectivos ? FIN_CURSO : t.hasta,
+    ];
+    const hasta = [t.hasta, ...known].sort()[0] ?? t.hasta;
+    if (t.desde < desde) desde = t.desde;
+    if (hasta > end) end = hasta;
+    for (const { ymd, weekday } of days(t.desde, hasta)) {
       const holiday = holidays.has(ymd);
       const runs =
         (holiday && t.festivos === 'si') ||
@@ -167,6 +177,8 @@ export function toGtfs(agencia: string, tablas: Tabla[], festivos = FESTIVOS_BAL
     ['calendar_dates.txt', calendarDates],
     ['trips.txt', trips],
     ['stop_times.txt', stopTimes],
+    // Las fechas de las tablas, aunque los primeros o los últimos días estén cerrados.
+    ['feed_info.txt', end === '' ? [] : [{ feed_start_date: desde, feed_end_date: end }]],
   ]);
 }
 
@@ -204,7 +216,9 @@ export function parseDays(label: string): { dias: string; festivos: boolean } | 
   const t = fold(label);
   if (/todos los dias|diario/.test(t)) return { dias: '1111111', festivos: true };
   const found = [...t.matchAll(/\b(lunes|martes|miercoles|jueves|viernes|sabado|domingo)s?\b/g)];
-  if (found.length === 0) return undefined;
+  // «Festivos» a secas: solo los festivos.
+  if (found.length === 0)
+    return /^festivos?$/.test(t) ? { dias: '0000000', festivos: true } : undefined;
   const on = Array<boolean>(7).fill(false);
   for (let i = 0; i < found.length; i++) {
     const day = DAY_NAMES.indexOf(found[i]![1]!);
@@ -218,6 +232,6 @@ export function parseDays(label: string): { dias: string; festivos: boolean } | 
     } else on[day] = true;
   }
   // «Martes y viernes no festivos», «ni los festivos»: los nombra para excluirlos.
-  const festivos = /\bfestiv/.test(t) && !/\b(no|ni|ni los|excepto|salvo)\s+festiv/.test(t);
+  const festivos = /\bfestiv/.test(t) && !/\b(no|ni|excepto|salvo)\s+(los\s+)?festiv/.test(t);
   return { dias: on.map((x) => (x ? '1' : '0')).join(''), festivos };
 }

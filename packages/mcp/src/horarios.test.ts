@@ -23,6 +23,8 @@ describe('horarios', () => {
       dias: '0100100',
       festivos: false,
     });
+    expect(parseDays('De Lunes a Viernes excepto los festivos')?.festivos).toBe(false);
+    expect(parseDays('Festivos')).toEqual({ dias: '0000000', festivos: true });
     expect(parseDays('Temporada alta')).toBeUndefined();
   });
 
@@ -70,6 +72,19 @@ describe('horarios', () => {
       '23:50 X1',
     ]);
     expect(times(stopTimes(index, 'a', { date: '2026-12-24', limit: 9 }))).toEqual(['08:00 X1']);
+  });
+
+  it('ends a school-day table with the last published school year instead of going silent', () => {
+    const tabla = {
+      ...base,
+      dias: '1111100',
+      festivos: 'no' as const,
+      salidas: [['08:00', '08:30']],
+    };
+    const school = { ...tabla, desde: '20270601', hasta: '20270930', soloLectivos: true };
+    const idx = buildIndex(toGtfs('Operador', [school]), 'horario escolar');
+    expect(idx.end).toBe('2027-06-18');
+    expect(() => stopTimes(idx, 'a', { date: '2027-09-20', limit: 9 })).toThrow(/2027-06-18/);
   });
 
   it('carries a trip past midnight instead of going back in time', () => {
@@ -351,6 +366,17 @@ describe('Tren de Sóller', () => {
     toGtfs('Ferrocarril de Sóller', sollerTablas(page, '20261122')),
     'Sóller',
   );
+
+  it('keeps the dates of a fully closed line, so a closed day explains why', () => {
+    // Desde el 23 el tren cierra todo el horizonte y el tranvía hasta el 22 de diciembre.
+    const closed = buildIndex(
+      toGtfs('Ferrocarril de Sóller', sollerTablas(page, '20261123')),
+      'Sóller',
+    );
+    const r = stopTimes(closed, 'soller-palma', { date: '2026-11-25', limit: 9 });
+    expect(r.total).toBe(0);
+    expect(r.avisos?.[0]).toContain('Cerrado del 23/11/2026');
+  });
 
   it('reads closure dates in both formats', () => {
     expect(dates('del 23/11/2026 al 1 de febrero de 2027')).toEqual(['20261123', '20270201']);
