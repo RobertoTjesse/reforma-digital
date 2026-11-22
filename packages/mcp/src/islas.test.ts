@@ -79,8 +79,8 @@ describe('TIB', () => {
 
   it('fails loudly when a required table or column is missing', () => {
     const broken = files(tib);
-    broken.set('feed_info.txt', readCsv('feed_version\n1\n'));
-    expect(() => buildIndex(broken, 'GTFS de TIB')).toThrow(/feed_start_date/);
+    broken.set('trips.txt', readCsv('route_id,trip_id\n3014,a\n'));
+    expect(() => buildIndex(broken, 'GTFS de TIB')).toThrow(/service_id/);
     broken.delete('stops.txt');
     expect(() => buildIndex(broken, 'GTFS de TIB')).toThrow(/GTFS de TIB le falta stops\.txt/);
   });
@@ -130,6 +130,12 @@ describe('TIB', () => {
     expect(salidas('estacio intermodal', '2026-01-05', { route: 'T1' })).toEqual(['08:00 T1']);
   });
 
+  it('takes the dates from the calendar when feed_info.txt leaves them out', () => {
+    const partial = files(tib);
+    partial.set('feed_info.txt', readCsv('feed_version,feed_end_date\n1,\n'));
+    expect(buildIndex(partial, 'GTFS de TIB').end).toBe('2027-12-31');
+  });
+
   it('refuses dates the feed does not cover instead of answering with a partial timetable', () => {
     expect(() => salidas('984', '2028-06-01')).toThrow(/del 2026-01-01 al 2027-12-31/);
     // El día después del último aún tiene su nocturno (el 31 de diciembre de 2027 es viernes).
@@ -144,6 +150,7 @@ describe('TIB', () => {
     expect(resolveDate('today', now)).toBe('2027-01-01');
     expect(resolveDate('mañana', now)).toBe('2027-01-02');
     expect(() => resolveDate('2026-02-31', now)).toThrow(/no válida/);
+    expect(() => resolveDate('2026-13-45', now)).toThrow(/no válida/);
     expect(() => resolveDate('15/03/2026', now)).toThrow(/no válida/);
   });
 });

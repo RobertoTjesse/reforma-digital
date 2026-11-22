@@ -60,7 +60,7 @@ const servidores: Servidor[] = [
     id: 'islas',
     name: 'Transporte de Baleares',
     category: 'transporte',
-    logo: { src: '/organismos/islas.svg' },
+    logo: { src: '/organismos/tib.png' },
     escena: islasEscena,
     summary:
       'Líneas, paradas y horarios del transporte público de Mallorca, Menorca y Formentera: TIB, la EMT de Palma, el Tren de Sóller, TMSA, Bus Torres y Bus Formentera.',
