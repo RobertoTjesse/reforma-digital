@@ -3,7 +3,7 @@ import { POST as renfe } from '../../app/mcp/renfe/route';
 import { POST as boe } from '../../app/mcp/boe/route';
 import { POST as carburantes } from '../../app/mcp/carburantes/route';
 import { POST as ine } from '../../app/mcp/ine/route';
-import { POST as baleares } from '../../app/mcp/baleares/route';
+import { POST as mallorca } from '../../app/mcp/mallorca/route';
 import type { StaticImageData } from 'next/image';
 import type { Category } from './categorias';
 import congresoEscena from './escenas/congreso.png';
@@ -11,7 +11,7 @@ import renfeEscena from './escenas/renfe.png';
 import boeEscena from './escenas/boe.png';
 import carburantesEscena from './escenas/carburantes.png';
 import ineEscena from './escenas/ine.png';
-import balearesEscena from './escenas/baleares.png';
+import mallorcaEscena from './escenas/mallorca.png';
 
 /** Lo que el servidor no sabe de sí mismo; las herramientas se le preguntan a él (`servers()`). */
 type Servidor = {
@@ -57,17 +57,17 @@ const servidores: Servidor[] = [
     ],
   },
   {
-    id: 'baleares',
-    name: 'Transporte público de Baleares',
+    id: 'mallorca',
+    name: 'Transporte público de Mallorca',
     category: 'transporte',
     logo: { src: '/organismos/tib.png' },
-    escena: balearesEscena,
+    escena: mallorcaEscena,
     summary:
-      'Líneas, paradas y horarios del transporte público de Mallorca, Menorca y Formentera: TIB, la EMT de Palma, el Tren de Sóller, TMSA, Bus Torres y Bus Formentera.',
+      'Líneas, paradas y horarios del transporte público de Mallorca: bus, tren y metro de TIB, los autobuses urbanos de la EMT de Palma y el Tren de Sóller.',
     examples: [
       '¿A qué hora sale el próximo bus de Port de Sóller a Palma?',
       '¿Cuándo pasa el A1 al aeropuerto por la plaza de España?',
-      '¿Cuándo sale el próximo bus de Maó a Ciutadella?',
+      '¿A qué hora sale el tren de Palma a Sóller el sábado?',
     ],
   },
   {
@@ -136,7 +136,7 @@ type Entry = Servidor & { handler: (request: Request) => Promise<Response> };
 const handlers: Record<string, Entry['handler']> = {
   congreso,
   renfe,
-  baleares,
+  mallorca,
   boe,
   ine,
   carburantes,

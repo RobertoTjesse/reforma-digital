@@ -388,7 +388,7 @@ const FILES =
 
 /** Descarga el zip o monta las tablas del operador, y lo indexa; shapes.txt (lo que más pesa) no se
  * descomprime. */
-export async function loadIndex(fetchImpl: Fetch, feed: Feed): Promise<Index> {
+async function loadIndex(fetchImpl: Fetch, feed: Feed): Promise<Index> {
   if (feed.load) return buildIndex(await feed.load(fetchImpl), feed.label);
   const response = await get(fetchImpl, feed.url, 'application/zip');
   let zip: Uint8Array;
@@ -454,13 +454,10 @@ function rank<T>(items: T[], query: string, keys: (item: T) => string[]) {
 
 const byLine = (a: Route, b: Route) => a.linea.localeCompare(b.linea, 'ca', { numeric: true });
 
-/** Cómo se puede pedir una línea: «L01» de TMSA también es «1», y su código interno «601». */
-const lineNames = (r: Route) => [r.linea, r.linea.replace(/^L0*(?=.)/i, ''), r.id];
-
 export function findRoutes(index: Index, query: string | undefined, limit: number) {
   const sorted = [...index.routes].sort(byLine);
   const matched =
-    query === undefined ? sorted : rank(sorted, query, (r) => [...lineNames(r), r.nombre]);
+    query === undefined ? sorted : rank(sorted, query, (r) => [r.linea, r.id, r.nombre]);
   return { consulta: query ?? null, total: matched.length, lineas: matched.slice(0, limit) };
 }
 
@@ -476,9 +473,7 @@ export function findStops(index: Index, query: string, limit: number) {
 function resolveRoute(index: Index, text: string): Route {
   const q = fold(text);
   const route =
-    index.routes.find((r) => r.id === text) ??
-    index.routes.find((r) => fold(r.linea) === q) ??
-    index.routes.find((r) => lineNames(r).some((n) => fold(n) === q.replace(/^l0*(?=.)/, '')));
+    index.routes.find((r) => r.id === text) ?? index.routes.find((r) => fold(r.linea) === q);
   if (!route) throw new SourceError(`Línea «${text}» no encontrada: búscala con find_routes.`);
   return route;
 }

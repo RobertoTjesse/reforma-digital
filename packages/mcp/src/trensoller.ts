@@ -116,7 +116,7 @@ export function toTablas(page: string, today: string): Tabla[] {
   const { tren, tranvia } = parseTables(page);
   const cierres = closures(page);
   const end = addDays(iso(today), HORIZON_DAYS).replaceAll('-', '');
-  const closed = (c?: Cierre) => (c ? [...days(c.desde, c.hasta)].map((d) => d.ymd) : []);
+  const closed = (c?: Cierre) => (c ? [...days(c.desde, c.hasta)] : []);
   const starred = tren.flatMap((t) =>
     t.salidas
       .filter((s) => s[0]?.endsWith('*'))
@@ -152,7 +152,7 @@ export function toTablas(page: string, today: string): Tabla[] {
     nota: notaTranvia,
     tipo: 0,
   };
-  const base = { dias: '1111111', festivos: 'igual' as const, desde: today, hasta: end };
+  const base = { desde: today, hasta: end };
   return [
     ...tren.map((t) => ({
       ...base,

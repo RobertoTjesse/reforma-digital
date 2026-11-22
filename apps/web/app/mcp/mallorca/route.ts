@@ -1,10 +1,10 @@
-import { createBalearesMcp } from '@reforma-digital/mcp';
+import { createMallorcaMcp } from '@reforma-digital/mcp';
 import { openInBrowser } from '../../../lib/mcp/rutas';
 
 export const runtime = 'nodejs';
 
-const mcp = createBalearesMcp();
+const mcp = createMallorcaMcp();
 
 export const POST = (request: Request) => mcp.fetch(request);
 // Sin sesiones, GET no sirve a los clientes MCP: un navegador va a la ficha y el resto recibe 405.
-export const GET = openInBrowser('baleares');
+export const GET = openInBrowser('mallorca');
