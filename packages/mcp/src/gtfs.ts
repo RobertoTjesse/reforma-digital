@@ -351,15 +351,16 @@ export function buildIndex(files: Files, label: string): Index {
     trip.estimated = headwayOnly.has(id);
   }
 
-  // Sin feed_info.txt (la EMT no lo publica), el feed vale lo que su calendario.
-  const [info] = maybe('feed_info.txt', ['feed_start_date', 'feed_end_date'], ['feed_version']);
+  // Sin feed_info.txt (la EMT no lo publica) o sin sus fechas, que el GTFS deja como opcionales, el
+  // feed vale lo que su calendario.
+  const [info] = maybe('feed_info.txt', [], ['feed_start_date', 'feed_end_date', 'feed_version']);
   const days = [
     ...[...services.values()].flatMap((s) => [s.start, s.end]),
     // Un día suprimido no es un día con horarios.
     ...[...exceptions].filter(([, added]) => added).map(([k]) => k.split(' ')[1] ?? ''),
   ].sort();
-  const start = info ? info.feed_start_date : days[0];
-  const end = info ? info.feed_end_date : days.at(-1);
+  const start = info?.feed_start_date || days[0];
+  const end = info?.feed_end_date || days.at(-1);
   if (start === undefined || end === undefined) {
     throw new SourceError(`El ${label} no dice qué fechas cubre (ni feed_info ni calendario).`);
   }
@@ -610,7 +611,6 @@ export function stopTimes(
   };
 }
 
-/** Fecha y segundos desde medianoche en Madrid. */
 export function madrid(now: number) {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Europe/Madrid',
@@ -635,6 +635,13 @@ export function resolveDate(text: string, now: number): string {
   const today = madrid(now).date;
   if (['today', 'hoy', 'avui'].includes(word)) return today;
   if (['tomorrow', 'mañana', 'manana', 'demà'].includes(word)) return addDays(today, 1);
-  if (/^\d{4}-\d{2}-\d{2}$/.test(word) && addDays(word, 0) === word) return word;
+  // Date.parse descarta el mes 13; addDays, el 31 de febrero (lo pasaría al 3 de marzo).
+  if (
+    /^\d{4}-\d{2}-\d{2}$/.test(word) &&
+    !Number.isNaN(Date.parse(word)) &&
+    addDays(word, 0) === word
+  ) {
+    return word;
+  }
   throw new SourceError(`Fecha «${text}» no válida: usa AAAA-MM-DD, today o tomorrow.`);
 }

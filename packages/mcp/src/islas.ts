@@ -123,8 +123,10 @@ export function createIslasMcp(fetchImpl: Fetch = fetch) {
         },
         (a) =>
           use(a.operador, (index) => {
-            const now = madrid(Date.now());
-            const date = resolveDate(a.date, Date.now());
+            // Un solo instante: a medianoche, dos lecturas del reloj podrían caer en días distintos.
+            const instant = Date.now();
+            const now = madrid(instant);
+            const date = resolveDate(a.date, instant);
             const [h = 0, m = 0] = a.after === undefined ? [] : a.after.split(':').map(Number);
             const after =
               a.after !== undefined

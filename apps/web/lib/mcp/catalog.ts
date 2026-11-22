@@ -60,7 +60,7 @@ const servidores: Servidor[] = [
     id: 'islas',
     name: 'Transporte de Baleares',
     category: 'transporte',
-    logo: { src: '/organismos/islas.svg' },
+    logo: { src: '/organismos/tib.png' },
     escena: islasEscena,
     summary:
       'Líneas, paradas y horarios del transporte público de Mallorca: bus, tren y metro de TIB y los autobuses urbanos de la EMT de Palma.',
