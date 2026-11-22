@@ -1,5 +1,5 @@
-// Líneas, paradas y horarios publicados en el GTFS abierto de un operador. Sin tiempo real, así que
-// los retrasos no se ven.
+// Líneas, paradas y horarios publicados sobre un GTFS: el zip abierto de un operador o las tablas
+// que monta horarios.ts para los que no lo publican. Sin tiempo real, así que los retrasos no se ven.
 import { strFromU8, unzipSync } from 'fflate';
 import { fold, get, SourceError, type Fetch } from './comun';
 
@@ -10,8 +10,10 @@ export type Files = Map<string, Row[]>;
 /** Un operador: `label` es como se le nombra en los errores («GTFS de TIB»). */
 export type Feed = {
   label: string;
-  /** El zip del GTFS. */
+  /** El zip del GTFS o, con `load`, la página de la que salen sus horarios. */
   url: string;
+  /** Para los operadores sin GTFS (horarios.ts): monta sus tablas con lo que publican. */
+  load?: (fetchImpl: Fetch) => Promise<Files>;
   source: string;
 };
 
@@ -154,7 +156,7 @@ export type Index = {
   exceptions: Map<string, boolean>;
 };
 
-const iso = (ymd: string) => `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
+export const iso = (ymd: string) => `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
 
 function seconds(label: string, time: string): number | undefined {
   if (time === '') return undefined;
@@ -384,8 +386,10 @@ export function buildIndex(files: Files, label: string): Index {
 const FILES =
   /^(agency|routes|stops|trips|stop_times|calendar|calendar_dates|feed_info|frequencies)\.txt$/;
 
-/** Descarga el zip y lo indexa; shapes.txt (lo que más pesa) no se descomprime. */
+/** Descarga el zip o monta las tablas del operador, y lo indexa; shapes.txt (lo que más pesa) no se
+ * descomprime. */
 async function loadIndex(fetchImpl: Fetch, feed: Feed): Promise<Index> {
+  if (feed.load) return buildIndex(await feed.load(fetchImpl), feed.label);
   const response = await get(fetchImpl, feed.url, 'application/zip');
   let zip: Uint8Array;
   try {
@@ -537,7 +541,7 @@ export function runsOn(index: Index, service: string, date: string): boolean {
   return s.days[(new Date(`${date}T00:00:00Z`).getUTCDay() + 6) % 7] === true;
 }
 
-const addDays = (date: string, days: number) => {
+export const addDays = (date: string, days: number) => {
   const d = new Date(`${date}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);

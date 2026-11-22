@@ -7,6 +7,7 @@ import { POST as alsa } from '../../app/mcp/alsa/route';
 import { POST as eustat } from '../../app/mcp/eustat/route';
 import { POST as tib } from '../../app/mcp/tib/route';
 import { POST as emtPalma } from '../../app/mcp/emt-palma/route';
+import { POST as trenSoller } from '../../app/mcp/tren-soller/route';
 import type { StaticImageData } from 'next/image';
 import type { Category } from './categorias';
 import congresoEscena from './escenas/congreso.png';
@@ -18,6 +19,7 @@ import alsaEscena from './escenas/alsa.png';
 import eustatEscena from './escenas/eustat.png';
 import tibEscena from './escenas/tib.png';
 import emtPalmaEscena from './escenas/emt-palma.png';
+import trenSollerEscena from './escenas/tren-soller.png';
 
 /** Lo que el servidor no sabe de sí mismo; las herramientas se le preguntan a él (`servers()`). */
 type Servidor = {
@@ -161,6 +163,20 @@ const servidores: Servidor[] = [
       '¿Qué buses salen de Sindicat esta noche?',
     ],
   },
+  {
+    id: 'tren-soller',
+    name: 'Tren de Sóller',
+    category: 'transporte',
+    logo: { src: '/organismos/tren-soller.png' },
+    escena: trenSollerEscena,
+    summary:
+      'Horarios del tren histórico de Palma a Sóller y del tranvía al Port de Sóller, con los días de cierre que anuncia el Ferrocarril de Sóller.',
+    examples: [
+      '¿A qué hora sale el tren de Palma a Sóller el sábado?',
+      '¿Cada cuánto pasa el tranvía al Port de Sóller?',
+      '¿Hay tren a Sóller en enero?',
+    ],
+  },
 ];
 
 type Param = {
@@ -193,6 +209,7 @@ const handlers: Record<string, Entry['handler']> = {
   alsa,
   tib,
   'emt-palma': emtPalma,
+  'tren-soller': trenSoller,
 };
 const entries: Entry[] = servidores.map((s) => {
   const handler = handlers[s.id];
