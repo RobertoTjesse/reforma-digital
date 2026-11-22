@@ -2,7 +2,7 @@
 // El Tren de Sóller sin red: trozos de HTML con la forma de los de su web.
 import { describe, expect, it } from 'vitest';
 import { buildIndex, routeStops, stopTimes } from './gtfs';
-import { toGtfs } from './horarios';
+import { days, toGtfs } from './horarios';
 import { closures, dates, toTablas as sollerTablas } from './trensoller';
 
 const times = (r: ReturnType<typeof stopTimes>) => r.salidas.map((s) => `${s.hora} ${s.linea}`);
@@ -60,6 +60,10 @@ describe('Tren de Sóller', () => {
     const r = stopTimes(closed, 'soller-palma', { date: '2026-11-25', limit: 9 });
     expect(r.total).toBe(0);
     expect(r.avisos?.[0]).toContain('Cerrado del 23/11/2026');
+  });
+
+  it('counts every day of a long timetable, not just the first ones', () => {
+    expect([...days('20240101', '20261231')]).toHaveLength(1096);
   });
 
   it('reads closure dates in both formats', () => {

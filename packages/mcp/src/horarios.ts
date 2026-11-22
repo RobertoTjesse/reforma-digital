@@ -78,10 +78,9 @@ export type Tabla = {
 /** AAAAMMDD de los días entre dos fechas, las dos incluidas, con su día de la semana (0, lunes). */
 export function* days(desde: string, hasta: string) {
   const d = new Date(Date.UTC(+desde.slice(0, 4), +desde.slice(4, 6) - 1, +desde.slice(6, 8)));
-  for (let i = 0; i < 800; i++) {
-    const ymd = d.toISOString().slice(0, 10).replaceAll('-', '');
-    if (ymd > hasta) return;
-    yield { ymd, weekday: (d.getUTCDay() + 6) % 7 };
+  const ymd = () => d.toISOString().slice(0, 10).replaceAll('-', '');
+  for (let day = ymd(); day <= hasta; day = ymd()) {
+    yield { ymd: day, weekday: (d.getUTCDay() + 6) % 7 };
     d.setUTCDate(d.getUTCDate() + 1);
   }
 }
