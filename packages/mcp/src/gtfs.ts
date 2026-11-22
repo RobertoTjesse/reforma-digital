@@ -388,7 +388,7 @@ const FILES =
 
 /** Descarga el zip o monta las tablas del operador, y lo indexa; shapes.txt (lo que más pesa) no se
  * descomprime. */
-async function loadIndex(fetchImpl: Fetch, feed: Feed): Promise<Index> {
+export async function loadIndex(fetchImpl: Fetch, feed: Feed): Promise<Index> {
   if (feed.load) return buildIndex(await feed.load(fetchImpl), feed.label);
   const response = await get(fetchImpl, feed.url, 'application/zip');
   let zip: Uint8Array;

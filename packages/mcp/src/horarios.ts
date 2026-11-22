@@ -1,11 +1,11 @@
-// Operadores sin GTFS (el Tren de Sóller, TMSA, Bus Torres): publican sus horarios
+// Operadores sin GTFS (el Tren de Sóller, TMSA, Bus Torres, Bus Formentera): publican sus horarios
 // como tablas de paradas por salidas. Aquí se convierten en las tablas de un GTFS para servirlos
 // con las mismas herramientas que los de TIB o la EMT.
 import { fold, SourceError } from './comun';
 import type { Files, Row } from './gtfs';
 
 /** AAAAMMDD separados por espacios a una lista. */
-const ymds = (text: string) => text.trim().split(/\s+/);
+export const ymds = (text: string) => text.trim().split(/\s+/);
 
 /** Festivos de ámbito general de las Illes Balears: 2026 (BOIB núm. 129, de 27/09/2025, y sus
  * modificaciones) y 2027 (Consell de Govern de 13/03/2026). Los locales de cada municipio no se
