@@ -58,6 +58,7 @@ describe('preguntar a la biblioteca MCP', () => {
       'tmsa',
       'bus-torres',
       'bus-formentera',
+      'bus-eivissa',
       'ninguno',
     ]);
   });

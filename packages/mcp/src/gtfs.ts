@@ -14,6 +14,8 @@ export type Feed = {
   url: string;
   /** Para los operadores sin GTFS (horarios.ts): monta sus tablas con lo que publican. */
   load?: (fetchImpl: Fetch) => Promise<Files>;
+  /** Cabeceras para descargar el zip, como la clave del Punto de Acceso Nacional. */
+  headers?: Record<string, string>;
   source: string;
 };
 
@@ -390,7 +392,7 @@ const FILES =
  * descomprime. */
 export async function loadIndex(fetchImpl: Fetch, feed: Feed): Promise<Index> {
   if (feed.load) return buildIndex(await feed.load(fetchImpl), feed.label);
-  const response = await get(fetchImpl, feed.url, 'application/zip');
+  const response = await get(fetchImpl, feed.url, 'application/zip', undefined, feed.headers);
   let zip: Uint8Array;
   try {
     zip = new Uint8Array(await response.arrayBuffer());
@@ -457,8 +459,9 @@ function rank<T>(items: T[], query: string, keys: (item: T) => string[]) {
 
 const byLine = (a: Route, b: Route) => a.linea.localeCompare(b.linea, 'ca', { numeric: true });
 
-/** Cómo se puede pedir una línea: «L01» de TMSA también es «1», y su código interno «601». */
-const lineNames = (r: Route) => [r.linea, r.linea.replace(/^L0*(?=.)/i, ''), r.id];
+/** Cómo se puede pedir una línea: «L01» de TMSA también es «1», y su código interno «601»; la
+ * «03» de Eivissa, «3». */
+const lineNames = (r: Route) => [r.linea, r.linea.replace(/^L?0*(?=.)/i, ''), r.id];
 
 export function findRoutes(index: Index, query: string | undefined, limit: number) {
   const sorted = [...index.routes].sort(byLine);
@@ -481,7 +484,7 @@ function resolveRoute(index: Index, text: string): Route {
   const route =
     index.routes.find((r) => r.id === text) ??
     index.routes.find((r) => fold(r.linea) === q) ??
-    index.routes.find((r) => lineNames(r).some((n) => fold(n) === q.replace(/^l0*(?=.)/, '')));
+    index.routes.find((r) => lineNames(r).some((n) => fold(n) === q.replace(/^l?0*(?=.)/, '')));
   if (!route) throw new SourceError(`Línea «${text}» no encontrada: búscala con find_routes.`);
   return route;
 }

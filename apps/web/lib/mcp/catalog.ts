@@ -11,6 +11,7 @@ import { POST as trenSoller } from '../../app/mcp/tren-soller/route';
 import { POST as tmsa } from '../../app/mcp/tmsa/route';
 import { POST as busTorres } from '../../app/mcp/bus-torres/route';
 import { POST as busFormentera } from '../../app/mcp/bus-formentera/route';
+import { POST as busEivissa } from '../../app/mcp/bus-eivissa/route';
 import type { StaticImageData } from 'next/image';
 import type { Category } from './categorias';
 import congresoEscena from './escenas/congreso.png';
@@ -26,6 +27,7 @@ import trenSollerEscena from './escenas/tren-soller.png';
 import tmsaEscena from './escenas/tmsa.png';
 import busTorresEscena from './escenas/bus-torres.png';
 import busFormenteraEscena from './escenas/bus-formentera.png';
+import busEivissaEscena from './escenas/bus-eivissa.png';
 
 /** Lo que el servidor no sabe de sí mismo; las herramientas se le preguntan a él (`servers()`). */
 type Servidor = {
@@ -225,6 +227,20 @@ const servidores: Servidor[] = [
       '¿Hay bus nocturno el sábado en Formentera?',
     ],
   },
+  {
+    id: 'bus-eivissa',
+    name: 'Bus Eivissa',
+    category: 'transporte',
+    logo: { src: '/organismos/tib.png' },
+    escena: busEivissaEscena,
+    summary:
+      "Líneas, paradas y horarios de los autobuses de Eivissa (red del Consell d'Eivissa con la marca TIB), del GTFS que publica en el Punto de Acceso Nacional de transporte.",
+    examples: [
+      '¿Cuándo sale el próximo bus de Eivissa a Sant Antoni?',
+      '¿A qué hora sale el último bus de Santa Eulària a Eivissa?',
+      '¿Hay Nit Bus de Sant Antoni a Eivissa el sábado?',
+    ],
+  },
 ];
 
 type Param = {
@@ -261,6 +277,7 @@ const handlers: Record<string, Entry['handler']> = {
   tmsa,
   'bus-torres': busTorres,
   'bus-formentera': busFormentera,
+  'bus-eivissa': busEivissa,
 };
 const entries: Entry[] = servidores.map((s) => {
   const handler = handlers[s.id];
