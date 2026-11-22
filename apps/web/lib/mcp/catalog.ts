@@ -229,7 +229,7 @@ const servidores: Servidor[] = [
   },
   {
     id: 'bus-eivissa',
-    name: 'Bus Eivissa',
+    name: 'TIB Eivissa',
     category: 'transporte',
     logo: { src: '/organismos/tib.png' },
     escena: busEivissaEscena,

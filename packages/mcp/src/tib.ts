@@ -4,7 +4,8 @@ import type { Fetch } from './comun';
 import { transporteMcp } from './transporte';
 
 const ABOUT = `Transporte público de Mallorca (TIB): líneas de bus interurbano, tren y metro, sus paradas y los horarios publicados.
-- No incluye los autobuses urbanos de Palma (EMT, como el A1 al aeropuerto) ni el tren histórico de Sóller y su tranvía, que son de otras empresas.`;
+- No incluye los autobuses urbanos de Palma (EMT, como el A1 al aeropuerto) ni el tren histórico de Sóller y su tranvía, que son de otras empresas.
+- Los autobuses de Eivissa, también con la marca TIB, están en el servidor bus-eivissa.`;
 
 export const createTibMcp = (fetchImpl: Fetch = fetch) =>
   transporteMcp({
