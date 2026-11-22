@@ -53,6 +53,7 @@ describe('preguntar a la biblioteca MCP', () => {
       'carburantes',
       'alsa',
       'tib',
+      'emt-palma',
       'ninguno',
     ]);
   });

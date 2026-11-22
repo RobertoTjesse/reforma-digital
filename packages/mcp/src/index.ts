@@ -142,3 +142,4 @@ export { createCarburantesMcp } from './carburantes';
 export { createEustatMcp } from './eustat';
 export { createIneMcp } from './ine';
 export { createTibMcp } from './tib';
+export { createEmtPalmaMcp } from './emt-palma';

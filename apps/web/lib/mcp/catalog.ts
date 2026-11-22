@@ -6,6 +6,7 @@ import { POST as ine } from '../../app/mcp/ine/route';
 import { POST as alsa } from '../../app/mcp/alsa/route';
 import { POST as eustat } from '../../app/mcp/eustat/route';
 import { POST as tib } from '../../app/mcp/tib/route';
+import { POST as emtPalma } from '../../app/mcp/emt-palma/route';
 import type { StaticImageData } from 'next/image';
 import type { Category } from './categorias';
 import congresoEscena from './escenas/congreso.png';
@@ -16,6 +17,7 @@ import ineEscena from './escenas/ine.png';
 import alsaEscena from './escenas/alsa.png';
 import eustatEscena from './escenas/eustat.png';
 import tibEscena from './escenas/tib.png';
+import emtPalmaEscena from './escenas/emt-palma.png';
 
 /** Lo que el servidor no sabe de sí mismo; las herramientas se le preguntan a él (`servers()`). */
 type Servidor = {
@@ -145,6 +147,20 @@ const servidores: Servidor[] = [
       '¿Qué trenes salen de Inca hacia Palma esta tarde?',
     ],
   },
+  {
+    id: 'emt-palma',
+    name: 'EMT Palma',
+    category: 'transporte',
+    logo: { src: '/organismos/emt-palma.png' },
+    escena: emtPalmaEscena,
+    summary:
+      'Líneas, paradas y horarios de los autobuses urbanos de Palma, aeropuerto y nocturnos incluidos, de los datos abiertos de la EMT de Palma.',
+    examples: [
+      '¿Cuándo pasa el próximo A1 al aeropuerto por la plaza de España?',
+      '¿Qué paradas tiene la línea 3?',
+      '¿Qué buses salen de Sindicat esta noche?',
+    ],
+  },
 ];
 
 type Param = {
@@ -176,6 +192,7 @@ const handlers: Record<string, Entry['handler']> = {
   carburantes,
   alsa,
   tib,
+  'emt-palma': emtPalma,
 };
 const entries: Entry[] = servidores.map((s) => {
   const handler = handlers[s.id];
