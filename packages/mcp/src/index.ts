@@ -145,3 +145,4 @@ export { createTibMcp } from './tib';
 export { createEmtPalmaMcp } from './emt-palma';
 export { createTrenSollerMcp } from './trensoller';
 export { createTmsaMcp } from './tmsa';
+export { createBusTorresMcp } from './bustorres';

@@ -1,4 +1,4 @@
-// Operadores sin GTFS (el Tren de Sóller, TMSA): publican sus horarios
+// Operadores sin GTFS (el Tren de Sóller, TMSA, Bus Torres): publican sus horarios
 // como tablas de paradas por salidas. Aquí se convierten en las tablas de un GTFS para servirlos
 // con las mismas herramientas que los de TIB o la EMT.
 import { fold, SourceError } from './comun';

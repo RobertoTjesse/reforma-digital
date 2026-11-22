@@ -9,6 +9,7 @@ import { POST as tib } from '../../app/mcp/tib/route';
 import { POST as emtPalma } from '../../app/mcp/emt-palma/route';
 import { POST as trenSoller } from '../../app/mcp/tren-soller/route';
 import { POST as tmsa } from '../../app/mcp/tmsa/route';
+import { POST as busTorres } from '../../app/mcp/bus-torres/route';
 import type { StaticImageData } from 'next/image';
 import type { Category } from './categorias';
 import congresoEscena from './escenas/congreso.png';
@@ -22,6 +23,7 @@ import tibEscena from './escenas/tib.png';
 import emtPalmaEscena from './escenas/emt-palma.png';
 import trenSollerEscena from './escenas/tren-soller.png';
 import tmsaEscena from './escenas/tmsa.png';
+import busTorresEscena from './escenas/bus-torres.png';
 
 /** Lo que el servidor no sabe de sí mismo; las herramientas se le preguntan a él (`servers()`). */
 type Servidor = {
@@ -193,6 +195,20 @@ const servidores: Servidor[] = [
       '¿Hay bus a Es Castell el domingo?',
     ],
   },
+  {
+    id: 'bus-torres',
+    name: 'Bus Torres',
+    category: 'transporte',
+    logo: { src: '/organismos/bus-torres.png' },
+    escena: busTorresEscena,
+    summary:
+      'El bus del aeropuerto de Menorca, los urbanos de Maó y Ciutadella y las líneas a las calas de Autocares Torres, con sus horarios.',
+    examples: [
+      '¿A qué hora pasa el bus del aeropuerto de Menorca a Maó?',
+      '¿Qué horario tiene el bus urbano de Ciutadella el sábado?',
+      '¿Hay bus a Cala Blanes el domingo?',
+    ],
+  },
 ];
 
 type Param = {
@@ -227,6 +243,7 @@ const handlers: Record<string, Entry['handler']> = {
   'emt-palma': emtPalma,
   'tren-soller': trenSoller,
   tmsa,
+  'bus-torres': busTorres,
 };
 const entries: Entry[] = servidores.map((s) => {
   const handler = handlers[s.id];
