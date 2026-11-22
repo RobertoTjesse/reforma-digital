@@ -55,6 +55,7 @@ describe('preguntar a la biblioteca MCP', () => {
       'tib',
       'emt-palma',
       'tren-soller',
+      'tmsa',
       'ninguno',
     ]);
   });

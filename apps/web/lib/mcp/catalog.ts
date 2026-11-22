@@ -8,6 +8,7 @@ import { POST as eustat } from '../../app/mcp/eustat/route';
 import { POST as tib } from '../../app/mcp/tib/route';
 import { POST as emtPalma } from '../../app/mcp/emt-palma/route';
 import { POST as trenSoller } from '../../app/mcp/tren-soller/route';
+import { POST as tmsa } from '../../app/mcp/tmsa/route';
 import type { StaticImageData } from 'next/image';
 import type { Category } from './categorias';
 import congresoEscena from './escenas/congreso.png';
@@ -20,6 +21,7 @@ import eustatEscena from './escenas/eustat.png';
 import tibEscena from './escenas/tib.png';
 import emtPalmaEscena from './escenas/emt-palma.png';
 import trenSollerEscena from './escenas/tren-soller.png';
+import tmsaEscena from './escenas/tmsa.png';
 
 /** Lo que el servidor no sabe de sí mismo; las herramientas se le preguntan a él (`servers()`). */
 type Servidor = {
@@ -177,6 +179,20 @@ const servidores: Servidor[] = [
       '¿Hay tren a Sóller en enero?',
     ],
   },
+  {
+    id: 'tmsa',
+    name: 'TMSA',
+    category: 'transporte',
+    logo: { src: '/organismos/tmsa.png' },
+    escena: tmsaEscena,
+    summary:
+      'Líneas, paradas y horarios de los autobuses interurbanos de Menorca de TMSA (Transportes Menorca), leídos de tmsa.es.',
+    examples: [
+      '¿Cuándo sale el próximo bus de Maó a Ciutadella?',
+      '¿Qué paradas tiene la L01?',
+      '¿Hay bus a Es Castell el domingo?',
+    ],
+  },
 ];
 
 type Param = {
@@ -210,6 +226,7 @@ const handlers: Record<string, Entry['handler']> = {
   tib,
   'emt-palma': emtPalma,
   'tren-soller': trenSoller,
+  tmsa,
 };
 const entries: Entry[] = servidores.map((s) => {
   const handler = handlers[s.id];

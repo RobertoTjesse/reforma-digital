@@ -118,7 +118,7 @@ export function toTablas(page: string, today: string): Tabla[] {
   const { tren, tranvia } = parseTables(page);
   const cierres = closures(page);
   const end = addDays(iso(today), HORIZON_DAYS).replaceAll('-', '');
-  const closed = (c?: Cierre) => (c ? [...days(c.desde, c.hasta)] : []);
+  const closed = (c?: Cierre) => (c ? [...days(c.desde, c.hasta)].map((d) => d.ymd) : []);
   const starred = tren.flatMap((t) =>
     t.salidas
       .filter((s) => s[0]?.endsWith('*'))
