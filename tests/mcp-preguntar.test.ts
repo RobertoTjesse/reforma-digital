@@ -47,7 +47,7 @@ describe('preguntar a la biblioteca MCP', () => {
     expect(m.vistas[0]).toEqual([
       'congreso',
       'renfe',
-      'islas',
+      'baleares',
       'boe',
       'ine',
       'carburantes',

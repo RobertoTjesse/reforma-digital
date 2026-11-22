@@ -16,7 +16,7 @@ import {
   runsOn,
   stopTimes,
 } from './gtfs';
-import { createIslasMcp } from './islas';
+import { createBalearesMcp } from './baleares';
 
 const tib: Record<string, string> = {
   'agency.txt': '﻿agency_id,agency_name\nA1,Grupo Ruiz\n',
@@ -244,7 +244,7 @@ describe('servidor', () => {
       'shapes.txt': strToU8('shape_id\nnot,valid,"csv'),
     });
     const fetchImpl = vi.fn<typeof fetch>(async () => new Response(zip));
-    const response = await createIslasMcp(fetchImpl).fetch(
+    const response = await createBalearesMcp(fetchImpl).fetch(
       new Request('http://localhost/mcp', {
         method: 'POST',
         headers: {

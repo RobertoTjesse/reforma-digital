@@ -3,7 +3,7 @@ import { POST as renfe } from '../../app/mcp/renfe/route';
 import { POST as boe } from '../../app/mcp/boe/route';
 import { POST as carburantes } from '../../app/mcp/carburantes/route';
 import { POST as ine } from '../../app/mcp/ine/route';
-import { POST as islas } from '../../app/mcp/islas/route';
+import { POST as baleares } from '../../app/mcp/baleares/route';
 import type { StaticImageData } from 'next/image';
 import type { Category } from './categorias';
 import congresoEscena from './escenas/congreso.png';
@@ -11,7 +11,7 @@ import renfeEscena from './escenas/renfe.png';
 import boeEscena from './escenas/boe.png';
 import carburantesEscena from './escenas/carburantes.png';
 import ineEscena from './escenas/ine.png';
-import islasEscena from './escenas/islas.png';
+import balearesEscena from './escenas/baleares.png';
 
 /** Lo que el servidor no sabe de sí mismo; las herramientas se le preguntan a él (`servers()`). */
 type Servidor = {
@@ -57,11 +57,11 @@ const servidores: Servidor[] = [
     ],
   },
   {
-    id: 'islas',
-    name: 'Transporte de Baleares',
+    id: 'baleares',
+    name: 'Transporte público de Baleares',
     category: 'transporte',
     logo: { src: '/organismos/tib.png' },
-    escena: islasEscena,
+    escena: balearesEscena,
     summary:
       'Líneas, paradas y horarios del transporte público de Mallorca, Menorca y Formentera: TIB, la EMT de Palma, el Tren de Sóller, TMSA, Bus Torres y Bus Formentera.',
     examples: [
@@ -136,7 +136,7 @@ type Entry = Servidor & { handler: (request: Request) => Promise<Response> };
 const handlers: Record<string, Entry['handler']> = {
   congreso,
   renfe,
-  islas,
+  baleares,
   boe,
   ine,
   carburantes,

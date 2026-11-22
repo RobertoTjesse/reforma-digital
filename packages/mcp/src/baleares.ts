@@ -60,11 +60,11 @@ const operador = z
 const query = z.string().trim().min(1).max(120);
 const limit = (n: number) => z.number().int().min(1).max(100).default(n);
 
-export function createIslasMcp(fetchImpl: Fetch = fetch) {
+export function createBalearesMcp(fetchImpl: Fetch = fetch) {
   const use = (id: (typeof IDS)[number], answer: (index: Index) => object) =>
     run(OPERADORES[id].source, async () => answer(await cachedIndex(fetchImpl, OPERADORES[id])));
   return server(
-    { name: 'reforma-digital-islas', title: 'Transporte público de las Illes Balears' },
+    { name: 'reforma-digital-baleares', title: 'Transporte público de Baleares' },
     INSTRUCTIONS,
     (s) => {
       s.registerTool(
