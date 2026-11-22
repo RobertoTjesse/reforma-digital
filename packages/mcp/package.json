@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.4.0",
+    "fflate": "^0.8.2",
     "zod": "^4.1.0"
   }
 }
