@@ -63,11 +63,11 @@ const servidores: Servidor[] = [
     logo: { src: '/organismos/islas.svg' },
     escena: islasEscena,
     summary:
-      'Líneas, paradas y horarios del transporte público de Mallorca: bus, tren y metro de TIB y los autobuses urbanos de la EMT de Palma.',
+      'Líneas, paradas y horarios del transporte público de Mallorca, Menorca y Formentera: TIB, la EMT de Palma, el Tren de Sóller, TMSA, Bus Torres y Bus Formentera.',
     examples: [
       '¿A qué hora sale el próximo bus de Port de Sóller a Palma?',
       '¿Cuándo pasa el A1 al aeropuerto por la plaza de España?',
-      '¿Qué líneas pasan por Inca?',
+      '¿Cuándo sale el próximo bus de Maó a Ciutadella?',
     ],
   },
   {
