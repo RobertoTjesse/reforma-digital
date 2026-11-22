@@ -1,5 +1,5 @@
 // @vitest-environment node
-// Bus Eivissa sin red: un GTFS mínimo con la forma del que publica el Consell en el NAP.
+// TIB Eivissa sin red: un GTFS mínimo con la forma del que publica el Consell.
 import { strToU8, zipSync } from 'fflate';
 import { describe, expect, it, vi } from 'vitest';
 import { createBusEivissaMcp } from './eivissa';
@@ -20,9 +20,9 @@ describe('Eivissa', () => {
       }).map(([name, text]) => [name, strToU8(text)]),
     ),
   );
-  const call = async (key: string | undefined) => {
+  it('downloads the public copy of the feed, without a key, and finds line «3» as «03»', async () => {
     const fetchImpl = vi.fn<typeof fetch>(async () => new Response(zip));
-    const response = await createBusEivissaMcp(fetchImpl, key).fetch(
+    const response = await createBusEivissaMcp(fetchImpl).fetch(
       new Request('http://localhost/mcp', {
         method: 'POST',
         headers: {
@@ -39,25 +39,9 @@ describe('Eivissa', () => {
       }),
     );
     const data = (await response.text()).match(/^data: (.*)$/m)?.[1];
-    const { result } = JSON.parse(data ?? 'null') as {
-      result: { isError?: boolean; content: { text: string }[] };
-    };
-    return { fetchImpl, result };
-  };
-
-  it('downloads the feed from the NAP with the API key, and finds line «3» as «03»', async () => {
-    const { fetchImpl, result } = await call('clave');
-    const [url, init] = fetchImpl.mock.calls[0] ?? [];
-    expect(url).toContain('nap.transportes.gob.es');
-    expect(new Headers(init?.headers).get('ApiKey')).toBe('clave');
+    const { result } = JSON.parse(data ?? 'null') as { result: { content: { text: string }[] } };
+    expect(fetchImpl.mock.calls[0]?.[0]).toContain('mobilitydatabase.org');
     expect(JSON.parse(result.content[0]?.text ?? '').linea.linea).toBe('03');
     expect(result.content[1]?.text).toContain('Powered by MITRAMS');
-  });
-
-  it('says the key is missing instead of answering without Eivissa', async () => {
-    const { fetchImpl, result } = await call(undefined);
-    expect(result.isError).toBe(true);
-    expect(result.content[0]?.text).toContain('falta la clave del NAP');
-    expect(fetchImpl).not.toHaveBeenCalled();
   });
 });

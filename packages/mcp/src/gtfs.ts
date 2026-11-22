@@ -14,8 +14,6 @@ export type Feed = {
   url: string;
   /** Para los operadores sin GTFS (horarios.ts): monta sus tablas con lo que publican. */
   load?: (fetchImpl: Fetch) => Promise<Files>;
-  /** Cabeceras para descargar el zip, como la clave del Punto de Acceso Nacional. */
-  headers?: Record<string, string>;
   source: string;
 };
 
@@ -392,7 +390,7 @@ const FILES =
  * descomprime. */
 export async function loadIndex(fetchImpl: Fetch, feed: Feed): Promise<Index> {
   if (feed.load) return buildIndex(await feed.load(fetchImpl), feed.label);
-  const response = await get(fetchImpl, feed.url, 'application/zip', undefined, feed.headers);
+  const response = await get(fetchImpl, feed.url, 'application/zip');
   let zip: Uint8Array;
   try {
     zip = new Uint8Array(await response.arrayBuffer());

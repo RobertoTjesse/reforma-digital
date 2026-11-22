@@ -31,17 +31,15 @@ export async function get(
   url: string,
   accept = 'application/json',
   body?: unknown,
-  /** Cabeceras propias de la fuente, como la clave del Punto de Acceso Nacional. */
-  headers: Record<string, string> = {},
 ) {
   let response: Response;
   try {
     response = await fetchImpl(url, {
       ...(body === undefined
-        ? { headers: { Accept: accept, ...headers } }
+        ? { headers: { Accept: accept } }
         : {
             method: 'POST',
-            headers: { Accept: accept, 'Content-Type': 'application/json', ...headers },
+            headers: { Accept: accept, 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
           }),
       signal: AbortSignal.timeout(20_000),
